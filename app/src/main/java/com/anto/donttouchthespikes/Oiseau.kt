@@ -19,7 +19,7 @@ class Oiseau(val echelle : Float, val view: DrawingView, context: Context): View
     var vy=0F
     var ay =0F
     var bmp: Bitmap = BitmapFactory.decodeResource(resources, R.drawable.oiseau)
-    val r = RectF(0F, 0F, 95F, 63F)
+    val r = RectF(0F+300F, 0F+500F, 95F+300F, 63F+500F)
     var flipped = false
     val random = Random
 
@@ -61,7 +61,12 @@ class Oiseau(val echelle : Float, val view: DrawingView, context: Context): View
         view.checkColor()
 
         if (view.nbrTouche == view.bonbon.nextVisible) {
-            view.bonbon.carre.offsetTo(150f, random.nextFloat()*view.screenHeight*0.9f+50)
+            if (vx < 0) {
+                view.bonbon.carre.offsetTo(150f, random.nextFloat()*view.screenHeight*0.65f+200)
+            }
+            else {
+                view.bonbon.carre.offsetTo(view.screenWidth-270f, random.nextFloat()*view.screenHeight*0.65f+200)
+            }
             view.bonbon.visible = true
         }
 
@@ -88,17 +93,8 @@ class Oiseau(val echelle : Float, val view: DrawingView, context: Context): View
             }
 
 
-        else if (r.contains(view.spikes.rhaut)
-                    || r.contains(view.spikes.rbas)) view.gameOver()
-
-        else if (RectF.intersects(r, view.parois[2].paroi)
-                    || RectF.intersects(r, view.parois[3].paroi)) {
-            view.nbrVies --
-            if (view.nbrVies > 0) {
-                r.offsetTo(view.screenWidth/2, view.screenHeight/2)
-                touch()
-            }
-        }
+        else if (RectF.intersects(r, view.spikes.rhaut)
+                    || RectF.intersects(r, view.spikes.rbas)) ouch()
         
         else if (view.bonbon.visible && RectF.intersects(r, view.bonbon.carre)) {
             view.bonbon.touch()
@@ -106,11 +102,7 @@ class Oiseau(val echelle : Float, val view: DrawingView, context: Context): View
 
         for (rect in view.spikes.liste1) {
             if (r.contains(rect)) {
-                view.nbrVies --
-                if (view.nbrVies > 0) {
-                    r.offsetTo(view.screenWidth/2, view.screenHeight/2)
-                    touch()
-                }
+                ouch()
                 view.spikes.liste1 = mutableListOf(re0)
             }
 
@@ -118,11 +110,7 @@ class Oiseau(val echelle : Float, val view: DrawingView, context: Context): View
 
         for (rect in view.spikes.liste2) {
             if (r.contains(rect)) {
-                view.nbrVies --
-                if (view.nbrVies > 0) {
-                    r.offsetTo(view.screenWidth/2, view.screenHeight/2)
-                    touch()
-                }
+                ouch()
                 view.spikes.liste2 = mutableListOf(re0)
             }
         }
@@ -130,8 +118,14 @@ class Oiseau(val echelle : Float, val view: DrawingView, context: Context): View
 
     fun touch() {
         vy =-1150F
+    }
 
-
+    fun ouch() {
+        view.nbrVies --
+        if (view.nbrVies > 0) {
+            r.offsetTo(view.screenWidth/2, view.screenHeight/2)
+            touch()
+        }
     }
 
     private fun Bitmap.flip(x: Float, y: Float): Bitmap {

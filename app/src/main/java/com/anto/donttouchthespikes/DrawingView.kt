@@ -33,7 +33,7 @@ class DrawingView @JvmOverloads constructor(context: Context, attributes: Attrib
     var record = 0
     var firstsetting = false
     val random = Random
-    val couleurs = arrayOf(Color.BLACK, Color.BLUE, Color.CYAN, Color.DKGRAY,
+    val couleurs = arrayOf(Color.BLACK, Color.BLUE, Color.CYAN,
             Color.GREEN, Color.LTGRAY, Color.MAGENTA, Color.RED, Color.WHITE, Color.YELLOW)
     val mp = MediaPlayer.create(context, R.raw.le_temps_est_bon)
     var parois: Array<Paroi> = arrayOf(Paroi(0f, 0f, 0f, 0f),
@@ -64,6 +64,7 @@ class DrawingView @JvmOverloads constructor(context: Context, attributes: Attrib
     fun reset() {
         nbrTouche = 0
         nbrVies = 1
+        oiseau.niveau = 1
         parois = arrayOf(Paroi(0f, 0f, 50f, screenHeight), //gauche
                 Paroi(screenWidth-50f, 0f, screenWidth, screenHeight), //droite
                 Paroi(0f,0f, screenWidth, 50f + 105f), //haut
@@ -71,6 +72,7 @@ class DrawingView @JvmOverloads constructor(context: Context, attributes: Attrib
         )
         oiseau.reset(screenWidth, screenHeight)
         bonbon.reset()
+        spikes.reset(screenWidth, screenHeight)
         if (firstsetting== false) firstsetting = true
         backgroundPaint.color = Color.WHITE
     }
@@ -99,8 +101,7 @@ class DrawingView @JvmOverloads constructor(context: Context, attributes: Attrib
     fun updatePositions(elapsedTimeMS: Double) {
         val interval = (elapsedTimeMS / 1000.0).toFloat()
         oiseau.update(interval)
-
-
+    }
 
     fun draw() {
         if (holder.surface.isValid) {
@@ -113,6 +114,7 @@ class DrawingView @JvmOverloads constructor(context: Context, attributes: Attrib
             bonbon.dessine(canvas)
             canvas.drawText("Votre score est:   $nbrTouche ",
                     30f, 50f, textPaint)
+            canvas.drawText("Niveau: ${oiseau.niveau}", 30f, 100f, textPaint)
             canvas.drawText("Vies restantes : $nbrVies", screenWidth*3/5, 50f, textPaint)
 
             holder.unlockCanvasAndPost(canvas)
@@ -132,7 +134,6 @@ class DrawingView @JvmOverloads constructor(context: Context, attributes: Attrib
         }
         gameOver = true
         oiseau.reset(screenWidth, screenHeight)
-        oiseau.niveau = 1
     }
 
     fun newGame() {
@@ -202,7 +203,8 @@ class DrawingView @JvmOverloads constructor(context: Context, attributes: Attrib
                 val builder = AlertDialog.Builder(getActivity())
                 builder.setTitle(messageId)
                 builder.setMessage("Votre score est:   "+ nbrTouche.toString()+ "\n"
-                        + "Votre record est:    $record")
+                        + "Votre record est:    $record"+ "\n"
+                        + "Vous êtes arrivé au niveau:      ${oiseau.niveau}")
                 builder.setPositiveButton("Redemarrer une partie",
                         DialogInterface.OnClickListener { _, _->newGame()}
                 )
